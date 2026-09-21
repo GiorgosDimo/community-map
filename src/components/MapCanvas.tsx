@@ -9,7 +9,6 @@ import {
 import { useSpots } from "@/hooks/useSpots";
 import { useRoutes } from "@/hooks/useRoutes";
 import { withinBbox, homeBbox, type HomeLocation, type Spot, type Route } from "@/lib/store";
-import { getSessionToken } from "@/lib/session";
 import { SpotPopup } from "./SpotPopup";
 import { RoutePopup } from "./RoutePopup";
 import { AddSpotForm } from "./AddSpotForm";
@@ -72,6 +71,7 @@ type Props = {
   onHomeEdit: () => void;
   onHomeDelete: () => void;
   onPopupOpen?: (open: boolean) => void;
+  currentUserId: string;
 };
 
 const CENTER: [number, number] = [52.0907, 5.1214];
@@ -182,11 +182,10 @@ function InlineEditForm({
 export function MapCanvas({
   spotsVisible, routesVisible, mode, onModeChange,
   pickingHome, onHomePicked, homeLocation, onHomeEdit, onHomeDelete,
-  onPopupOpen,
+  onPopupOpen, currentUserId,
 }: Props) {
   const { spots, add: addSpot, update: updateSpot, remove: removeSpot } = useSpots();
   const { routes, add: addRoute, update: updateRoute, remove: removeRoute } = useRoutes();
-  const sessionToken = getSessionToken();
 
   const skipNextClose = useRef(false);
   const [pendingLatLng, setPendingLatLng] = useState<L.LatLng | null>(null);
@@ -382,7 +381,7 @@ export function MapCanvas({
                 ) : (
                   <SpotPopup
                     spot={spot}
-                    isOwn={spot.sessionToken === sessionToken}
+                    isOwn={spot.userId === currentUserId}
                     onEdit={() => {
                       skipNextClose.current = true;
                       setTimeout(() => { skipNextClose.current = false; }, 200);
@@ -419,7 +418,7 @@ export function MapCanvas({
                     ) : (
                       <RoutePopup
                         route={route}
-                        isOwn={route.sessionToken === sessionToken}
+                        isOwn={route.userId === currentUserId}
                         onEdit={() => {
                           skipNextClose.current = true;
                           setTimeout(() => { skipNextClose.current = false; }, 200);

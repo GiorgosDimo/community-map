@@ -1,34 +1,68 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Paper, Typography } from "@mui/material";
+import { Box, CircularProgress, Paper, Typography } from "@mui/material";
 import { Menu } from "@/components/Menu";
 import { StartingLocationModal } from "@/components/StartingLocationModal";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { UsernameModal } from "@/components/UsernameModal";
 import { useHomeLocation } from "@/hooks/useHomeLocation";
+import { getSessionToken } from "@/lib/session";
 import type { HomeLocation } from "@/lib/store";
 import type L from "leaflet";
 
 const MapCanvas = dynamic(() => import("@/components/MapCanvas").then((m) => m.MapCanvas), { ssr: false });
 
 type Mode = "idle" | "addSpot" | "addRoute";
+type User = { id: string; username: string };
 
 export default function Home() {
   const [spotsVisible, setSpotsVisible] = useState(true);
   const [routesVisible, setRoutesVisible] = useState(false);
   const [mode, setMode] = useState<Mode>("idle");
   const { homeLocation, hasLocation, save: saveHome, deleteHome } = useHomeLocation();
-  // Start false on both server and client to avoid hydration mismatch; flip after mount if needed
+
+  // Auth state
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [needUsername, setNeedUsername] = useState(false);
+
+  // UI state — start false to avoid hydration mismatch
   const [showWelcome, setShowWelcome] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pickingHomeType, setPickingHomeType] = useState<string | null>(null);
+
   useEffect(() => {
     setMounted(true);
+    fetch("/api/auth/check-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: getSessionToken() }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.user) {
+          setCurrentUser(data.user);
+          if (!hasLocation) setShowWelcome(true);
+        } else {
+          setNeedUsername(true);
+        }
+        setAuthReady(true);
+      })
+      .catch(() => {
+        setNeedUsername(true);
+        setAuthReady(true);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAuthSuccess = (user: User) => {
+    setCurrentUser(user);
+    setNeedUsername(false);
     if (!hasLocation) setShowWelcome(true);
-  }, []);
-  const [pickingHomeType, setPickingHomeType] = useState<string | null>(null);
+  };
 
   const toggleMode = (next: "addSpot" | "addRoute") =>
     setMode((cur) => (cur === next ? "idle" : next));
@@ -62,8 +96,18 @@ export default function Home() {
     ? `Click the menu icon to add a new spot or route close to your ${homeLocation.type}`
     : "Click the menu icon to get started";
 
+  if (!authReady) {
+    return (
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <main className="relative h-screen w-full">
+      {needUsername && <UsernameModal onSuccess={handleAuthSuccess} />}
+
       {showWelcome && (
         <WelcomeScreen onGetStarted={() => { setShowWelcome(false); setShowModal(true); }} />
       )}
@@ -113,6 +157,7 @@ export default function Home() {
         onHomeEdit={handleHomeEdit}
         onHomeDelete={handleHomeDelete}
         onPopupOpen={setPopupOpen}
+        currentUserId={currentUser?.id ?? ""}
       />
     </main>
   );
