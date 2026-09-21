@@ -1,41 +1,44 @@
 "use client";
+import { Dialog, DialogContent, Typography, Button, Stack, Box } from "@mui/material";
+import PlaceIcon from "@mui/icons-material/Place";
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import GroupsIcon from "@mui/icons-material/Groups";
+
+const FEATURES = [
+  { Icon: PlaceIcon, text: "Pin hidden gems, favourite cafés, parks, or any place worth visiting near you." },
+  { Icon: DirectionsWalkIcon, text: "Draw walking or cycling routes your colleagues and neighbours will love." },
+  { Icon: GroupsIcon, text: "See what others have added and turn shared spots into places to meet and socialise." },
+];
 
 type Props = { onGetStarted: () => void };
 
 export function WelcomeScreen({ onGetStarted }: Props) {
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-[min(320px,calc(100vw-2rem))] space-y-6">
-        <div className="text-center space-y-2">
-          <div className="text-4xl mb-2">🗺️</div>
-          <h1 className="text-xl font-semibold tracking-tight">Community Map</h1>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            Discover and share interesting spots and routes around where you live, work, or study.
-          </p>
-        </div>
+    <Dialog open maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
+      <DialogContent>
+        <Stack spacing={3} alignItems="center">
+          <Box sx={{ textAlign: "center" }}>
+            <Typography variant="h3" mb={0.5}>🗺️</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>Community Map</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Discover and share interesting spots and routes around where you live, work, or study.
+            </Typography>
+          </Box>
 
-        <div className="space-y-3 text-sm text-gray-600">
-          <div className="flex items-start gap-3">
-            <span className="text-lg leading-none mt-0.5">📍</span>
-            <p>Pin hidden gems, favourite cafés, parks, or any place worth visiting near you.</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-lg leading-none mt-0.5">🚶</span>
-            <p>Draw walking, cycling, or driving routes your colleagues and neighbours will love.</p>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-lg leading-none mt-0.5">🤝</span>
-            <p>See what others have added and turn shared spots into places to meet and socialise.</p>
-          </div>
-        </div>
+          <Stack spacing={1.5} width="100%">
+            {FEATURES.map(({ Icon, text }, i) => (
+              <Stack key={i} direction="row" spacing={1.5} alignItems="flex-start">
+                <Icon color="primary" sx={{ mt: 0.25, flexShrink: 0 }} />
+                <Typography variant="body2" color="text.secondary">{text}</Typography>
+              </Stack>
+            ))}
+          </Stack>
 
-        <button
-          onClick={onGetStarted}
-          className="w-full bg-gray-900 text-white rounded-xl py-3 text-sm font-medium hover:bg-gray-700 transition-colors"
-        >
-          Get started
-        </button>
-      </div>
-    </div>
+          <Button variant="contained" fullWidth size="large" onClick={onGetStarted}>
+            Get started
+          </Button>
+        </Stack>
+      </DialogContent>
+    </Dialog>
   );
 }

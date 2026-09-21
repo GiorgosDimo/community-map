@@ -2,8 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Leaflet needs explicit height on its container */
 .leaflet-container {
   height: 100%;
   width: 100%;
+}
+
+/* Reset Leaflet popup chrome so MUI components render correctly inside popups */
+.leaflet-popup-content-wrapper {
+  padding: 8px;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
+}
+.leaflet-popup-content {
+  margin: 0;
+  font-size: 1rem;
+  line-height: inherit;
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Stack, TextField, Button, Typography, FormControlLabel, Checkbox } from "@mui/material";
 import type { Spot } from "@/lib/store";
 
 type Props = {
@@ -14,57 +15,63 @@ export function AddRouteForm({ spots, onSave, onCancel }: Props) {
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (id: string) =>
-    setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
+    setSelected(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
 
   return (
-    <div className="w-64 p-3 space-y-2">
-      <div>
-        <label className="text-xs text-gray-500">Name</label>
-        <input
-          className="w-full border rounded px-2 py-1 text-sm"
-          placeholder="Coffee and cat loop"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="text-xs text-gray-500">Description</label>
-        <textarea
-          className="w-full border rounded px-2 py-1 text-sm"
-          placeholder="Short loop past two good coffee spots"
-          rows={2}
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-        />
-      </div>
+    <Stack spacing={1.5} sx={{ width: 256, pt: 0.5 }}>
+      <TextField
+        label="Name"
+        size="small"
+        placeholder="Coffee and cat loop"
+        value={name}
+        onChange={e => setName(e.target.value)}
+        autoFocus
+        fullWidth
+      />
+      <TextField
+        label="Description"
+        size="small"
+        placeholder="Short loop past two good spots"
+        value={desc}
+        onChange={e => setDesc(e.target.value)}
+        multiline
+        rows={2}
+        fullWidth
+      />
       {spots.length > 0 && (
-        <div>
-          <label className="text-xs text-gray-500">Include spots (in order)</label>
-          <div className="space-y-1 mt-1">
-            {spots.map((s) => (
-              <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selected.includes(s.id)}
-                  onChange={() => toggle(s.id)}
-                />
-                {s.name}
-              </label>
-            ))}
-          </div>
-        </div>
+        <Stack spacing={0}>
+          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+            Include spots (in order)
+          </Typography>
+          {spots.map(s => (
+            <FormControlLabel
+              key={s.id}
+              control={<Checkbox checked={selected.includes(s.id)} onChange={() => toggle(s.id)} size="small" />}
+              label={<Typography variant="body2">{s.name}</Typography>}
+              sx={{ my: 0 }}
+            />
+          ))}
+        </Stack>
       )}
-      <div className="flex gap-2">
-        <button
-          className="flex-1 bg-blue-500 text-white rounded px-2 py-1 text-sm disabled:opacity-40"
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Button
+          variant="contained"
+          size="small"
           disabled={!name.trim() || selected.length < 2}
           onClick={() => onSave(name.trim(), desc.trim(), selected)}
+          sx={{ flex: 1 }}
         >
           Save
-        </button>
-        <button className="text-sm text-gray-500" onClick={onCancel}>Cancel</button>
-      </div>
-      {selected.length < 2 && <p className="text-xs text-gray-400">Select at least 2 spots</p>}
-    </div>
+        </Button>
+        <Button variant="text" size="small" color="inherit" onClick={onCancel}>
+          Cancel
+        </Button>
+      </Stack>
+      {selected.length < 2 && (
+        <Typography variant="caption" color="text.secondary">
+          Select at least 2 spots
+        </Typography>
+      )}
+    </Stack>
   );
 }

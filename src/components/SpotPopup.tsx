@@ -1,44 +1,34 @@
 "use client";
+import { Stack, Typography, Button } from "@mui/material";
 import type { Spot } from "@/lib/store";
 
-type Props = {
-  spot: Spot;
-  isOwn: boolean;
-  onEdit: () => void;
-  onRemove: () => void;
-};
+type Props = { spot: Spot; isOwn: boolean; onEdit: () => void; onRemove: () => void };
+
+const label = { textTransform: "uppercase", letterSpacing: 0.5, display: "block" } as const;
 
 export function SpotPopup({ spot, isOwn, onEdit, onRemove }: Props) {
   return (
-    <div className="w-52 p-3 space-y-2">
+    <Stack spacing={1.5} sx={{ width: 200, pt: 0.5 }}>
       <div>
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
-        <p className="font-medium text-sm">{spot.name}</p>
+        <Typography variant="caption" color="text.secondary" sx={label}>Name</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>{spot.name}</Typography>
       </div>
       {spot.description && (
         <div>
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Description</p>
-          <p className="text-sm text-gray-600">{spot.description}</p>
+          <Typography variant="caption" color="text.secondary" sx={label}>Description</Typography>
+          <Typography variant="body2" color="text.secondary">{spot.description}</Typography>
         </div>
       )}
       {isOwn ? (
-        <div className="flex gap-2 pt-1">
-          <button
-            className="flex-1 border border-gray-200 rounded-lg px-2 py-1 text-sm hover:bg-gray-50"
-            onClick={onEdit}
-          >
-            Edit
-          </button>
-          <button
-            className="border border-red-200 text-red-500 rounded-lg px-2 py-1 text-sm hover:bg-red-50"
-            onClick={onRemove}
-          >
-            Delete
-          </button>
-        </div>
+        <Stack direction="row" spacing={1} pt={0.5}>
+          <Button variant="outlined" size="small" onClick={onEdit} sx={{ flex: 1 }}>Edit</Button>
+          <Button variant="outlined" size="small" color="error" onClick={onRemove}>Delete</Button>
+        </Stack>
       ) : (
-        <p className="text-xs text-gray-400 italic">Added by a colleague</p>
+        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+          Added by a colleague
+        </Typography>
       )}
-    </div>
+    </Stack>
   );
 }

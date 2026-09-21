@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, LayerGroup, useMapEvents, useMap, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import {
+  Box, Paper, Stack, Typography, Button, TextField, ToggleButtonGroup, ToggleButton,
+} from "@mui/material";
 import { useSpots } from "@/hooks/useSpots";
 import { useRoutes } from "@/hooks/useRoutes";
 import { withinBbox, type HomeLocation, type Spot, type Route } from "@/lib/store";
@@ -29,7 +32,7 @@ const homeIcon = makeIcon("green");
 const routeSpotIcon = makeIcon("red");
 
 const waypointDivIcon = L.divIcon({
-  html: '<div style="width:10px;height:10px;border-radius:50%;background:#e63946;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div>',
+  html: '<div style="width:10px;height:10px;border-radius:50%;background:#2563eb;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div>',
   className: "",
   iconSize: [10, 10],
   iconAnchor: [5, 5],
@@ -111,7 +114,6 @@ function MapAutoCenter({ home, spots, routes }: { home: HomeLocation; spots: Spo
   return null;
 }
 
-// Compact edit form used inside a Leaflet Popup (no delete — delete is in the view popup)
 function InlineEditForm({
   name, onNameChange, desc, onDescChange, onSave, onCancel,
 }: {
@@ -120,43 +122,41 @@ function InlineEditForm({
   onSave: () => void; onCancel: () => void;
 }) {
   return (
-    <div className="w-52 p-3 space-y-2">
-      <div>
-        <label className="text-xs text-gray-400 uppercase tracking-wide mb-0.5 block">Name</label>
-        <input
-          autoFocus
-          className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
-          value={name}
-          onChange={e => onNameChange(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && onSave()}
-        />
-      </div>
-      <div>
-        <label className="text-xs text-gray-400 uppercase tracking-wide mb-0.5 block">Description</label>
-        <textarea
-          className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
-          rows={2}
-          value={desc}
-          onChange={e => onDescChange(e.target.value)}
-        />
-      </div>
-      <div className="flex gap-2 pt-1">
-        <button
-          className="flex-1 bg-blue-500 text-white rounded-lg px-2 py-1 text-sm disabled:opacity-40"
-          disabled={!name.trim()}
-          onClick={onSave}
-        >
+    <Stack spacing={1.5} sx={{ width: 200, pt: 0.5 }}>
+      <TextField
+        label="Name"
+        size="small"
+        value={name}
+        onChange={e => onNameChange(e.target.value)}
+        onKeyDown={e => e.key === "Enter" && onSave()}
+        autoFocus
+        fullWidth
+      />
+      <TextField
+        label="Description"
+        size="small"
+        value={desc}
+        onChange={e => onDescChange(e.target.value)}
+        multiline
+        rows={2}
+        fullWidth
+      />
+      <Stack direction="row" spacing={1}>
+        <Button variant="contained" size="small" disabled={!name.trim()} onClick={onSave} sx={{ flex: 1 }}>
           Save
-        </button>
-        <button className="border border-gray-200 rounded-lg px-2 py-1 text-sm text-gray-500" onClick={onCancel}>
+        </Button>
+        <Button variant="outlined" size="small" color="inherit" onClick={onCancel}>
           Cancel
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Stack>
+    </Stack>
   );
 }
 
-export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pickingHome, onHomePicked, homeLocation, onHomeEdit, onHomeDelete }: Props) {
+export function MapCanvas({
+  spotsVisible, routesVisible, mode, onModeChange,
+  pickingHome, onHomePicked, homeLocation, onHomeEdit, onHomeDelete,
+}: Props) {
   const { spots, add: addSpot, update: updateSpot, remove: removeSpot } = useSpots();
   const { routes, add: addRoute, update: updateRoute, remove: removeRoute } = useRoutes();
   const sessionToken = getSessionToken();
@@ -165,7 +165,6 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
   const [pendingLatLng, setPendingLatLng] = useState<L.LatLng | null>(null);
   const [pendingHomeLatLng, setPendingHomeLatLng] = useState<L.LatLng | null>(null);
 
-  // Route building
   const [transportMode, setTransportMode] = useState<TransportMode>("foot");
   const [routeWaypoints, setRouteWaypoints] = useState<[number, number][]>([]);
   const [routeGeometry, setRouteGeometry] = useState<[number, number][]>([]);
@@ -175,7 +174,6 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
   const [routeName, setRouteName] = useState("");
   const [routeDesc, setRouteDesc] = useState("");
 
-  // Inline edit state — switching popup content in place (no isEditing hide-popup trick needed)
   const [editingSpot, setEditingSpot] = useState<Spot | null>(null);
   const [editSpotName, setEditSpotName] = useState("");
   const [editSpotDesc, setEditSpotDesc] = useState("");
@@ -274,35 +272,25 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
 
         {homeLocation && <MapAutoCenter home={homeLocation} spots={spots} routes={routes} />}
 
-        {/* Home marker — popup with edit/delete */}
         {homeLocation && (
           <Marker position={[homeLocation.coordinates[1], homeLocation.coordinates[0]]} icon={homeIcon}>
-            <Popup minWidth={192}>
-              <div className="w-48 p-3 space-y-2">
+            <Popup minWidth={208}>
+              <Stack spacing={1.5} sx={{ width: 192, pt: 0.5 }}>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Starting Location</p>
-                  <p className="font-medium text-sm">{homeLocation.type}</p>
+                  <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 0.5, display: "block" }}>
+                    Starting Location
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{homeLocation.type}</Typography>
                 </div>
-                <div className="flex gap-2 pt-1">
-                  <button
-                    className="flex-1 border border-gray-200 rounded-lg px-2 py-1 text-sm hover:bg-gray-50"
-                    onClick={onHomeEdit}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="border border-red-200 text-red-500 rounded-lg px-2 py-1 text-sm hover:bg-red-50"
-                    onClick={onHomeDelete}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+                <Stack direction="row" spacing={1}>
+                  <Button variant="outlined" size="small" onClick={onHomeEdit} sx={{ flex: 1 }}>Edit</Button>
+                  <Button variant="outlined" size="small" color="error" onClick={onHomeDelete}>Delete</Button>
+                </Stack>
+              </Stack>
             </Popup>
           </Marker>
         )}
 
-        {/* Pending home marker — confirmation popup opens automatically */}
         {pendingHomeLatLng && (
           <Marker
             position={pendingHomeLatLng}
@@ -310,25 +298,27 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
             eventHandlers={{ add: e => (e.target as L.Marker).openPopup() }}
           >
             <Popup minWidth={200} closeButton={false}>
-              <div className="p-2 space-y-3">
-                <p className="text-sm text-gray-700">Save this as your starting location?</p>
-                <div className="flex gap-2">
-                  <button
-                    className="bg-gray-900 text-white text-sm rounded-lg px-3 py-1.5"
+              <Stack spacing={1.5} sx={{ pt: 0.5 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Save this as your starting location?
+                </Typography>
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    variant="contained"
+                    size="small"
                     onClick={() => { onHomePicked(pendingHomeLatLng); setPendingHomeLatLng(null); }}
                   >
                     Save
-                  </button>
-                  <button className="text-sm text-gray-500 underline" onClick={() => setPendingHomeLatLng(null)}>
+                  </Button>
+                  <Button variant="text" size="small" color="inherit" onClick={() => setPendingHomeLatLng(null)}>
                     Try again
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                </Stack>
+              </Stack>
             </Popup>
           </Marker>
         )}
 
-        {/* Spot markers */}
         {spotsVisible && spots.map(spot => (
           <Marker
             key={spot.id}
@@ -340,7 +330,7 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
           >
             <Tooltip>{spot.name}{spot.description ? ` — ${spot.description}` : ""}</Tooltip>
             {mode === "idle" && (
-              <Popup minWidth={208}>
+              <Popup minWidth={216}>
                 {editingSpot?.id === spot.id ? (
                   <InlineEditForm
                     name={editSpotName} onNameChange={setEditSpotName}
@@ -368,7 +358,6 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
           </Marker>
         ))}
 
-        {/* Saved routes — wide transparent hit area + visible line on top */}
         {routesVisible && routes.map(route => {
           const geo = route.geometry ?? [];
           const wpts = route.waypoints ?? [];
@@ -376,10 +365,9 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
           if (positions.length <= 1) return null;
           return (
             <LayerGroup key={route.id}>
-              {/* transparent buffer zone so the line is easy to click */}
               <Polyline positions={positions} weight={20} opacity={0}>
                 {mode === "idle" && (
-                  <Popup minWidth={208}>
+                  <Popup minWidth={216}>
                     {editingRoute?.id === route.id ? (
                       <InlineEditForm
                         name={editRouteName} onNameChange={setEditRouteName}
@@ -405,13 +393,11 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
                   </Popup>
                 )}
               </Polyline>
-              {/* visible styled line (non-interactive so clicks fall through to buffer) */}
               <Polyline positions={positions} color={route.colour} weight={4} interactive={false} />
             </LayerGroup>
           );
         })}
 
-        {/* Route preview while building */}
         {mode === "addRoute" && routeGeometry.length > 1 && (
           <Polyline positions={toLatlng(routeGeometry)} color={MODE_COLOR[transportMode]} dashArray="4 4" weight={3} />
         )}
@@ -419,14 +405,13 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
           <Marker key={i} position={[lat, lng]} icon={waypointDivIcon} />
         ))}
 
-        {/* Pending add-spot marker — popup opens automatically */}
         {mode === "addSpot" && pendingLatLng && (
           <Marker
             position={pendingLatLng}
             icon={pendingIcon}
             eventHandlers={{ add: e => (e.target as L.Marker).openPopup() }}
           >
-            <Popup minWidth={220} closeButton={false}>
+            <Popup minWidth={236} closeButton={false}>
               <AddSpotForm
                 saving={addSpot.isPending}
                 error={addSpot.error ? (addSpot.error as Error).message : null}
@@ -446,75 +431,89 @@ export function MapCanvas({ spotsVisible, routesVisible, mode, onModeChange, pic
         )}
       </MapContainer>
 
-      {/* Route-building bottom bar */}
       {mode === "addRoute" && (
-        <div className="absolute bottom-8 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:min-w-80 z-[1000] bg-white rounded-xl shadow-lg border border-gray-100 px-4 py-3">
-          {/* Transport mode picker */}
-          <div className="flex gap-1 mb-3">
-            {(["foot", "bike", "car"] as TransportMode[]).map(m => (
-              <button
-                key={m}
-                className={`flex-1 text-xs rounded-lg px-2 py-1.5 border transition-colors ${
-                  transportMode === m
-                    ? "bg-gray-900 text-white border-gray-900"
-                    : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
-                onClick={() => setTransportMode(m)}
-              >
+        <Paper
+          elevation={4}
+          sx={{
+            position: "absolute",
+            bottom: 32,
+            left: { xs: 16, sm: "50%" },
+            right: { xs: 16, sm: "auto" },
+            transform: { xs: "none", sm: "translateX(-50%)" },
+            minWidth: { sm: 320 },
+            zIndex: 1000,
+            borderRadius: 3,
+            px: 3,
+            py: 2.5,
+          }}
+        >
+          <ToggleButtonGroup
+            value={transportMode}
+            exclusive
+            onChange={(_, v) => v && setTransportMode(v)}
+            size="small"
+            fullWidth
+            sx={{ mb: 2 }}
+          >
+            {(["foot", "bike"] as TransportMode[]).map(m => (
+              <ToggleButton key={m} value={m} sx={{ flex: 1, fontSize: "0.75rem" }}>
                 {TRANSPORT_LABELS[m]}
-              </button>
+              </ToggleButton>
             ))}
-          </div>
+          </ToggleButtonGroup>
 
           {!savingRoute ? (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600">
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Typography variant="body2" color="text.secondary">
                 {routeLoading ? "Routing…" : `${routeWaypoints.length} point${routeWaypoints.length !== 1 ? "s" : ""}`}
-              </span>
-              <div className="flex gap-2 ml-auto">
+              </Typography>
+              <Stack direction="row" spacing={1} sx={{ ml: "auto" }}>
                 {routeWaypoints.length > 0 && (
-                  <button className="text-sm text-gray-500 underline" onClick={() => setRouteWaypoints(p => p.slice(0, -1))}>
+                  <Button variant="text" size="small" color="inherit" onClick={() => setRouteWaypoints(p => p.slice(0, -1))}>
                     Undo
-                  </button>
+                  </Button>
                 )}
                 {routeWaypoints.length >= 2 && (
-                  <button className="bg-gray-900 text-white text-sm rounded-lg px-3 py-1.5" onClick={() => setSavingRoute(true)}>
+                  <Button variant="contained" size="small" onClick={() => setSavingRoute(true)}>
                     Save route
-                  </button>
+                  </Button>
                 )}
-                <button className="text-sm text-gray-500 underline" onClick={() => onModeChange("idle")}>Cancel</button>
-              </div>
-            </div>
+                <Button variant="text" size="small" color="inherit" onClick={() => onModeChange("idle")}>
+                  Cancel
+                </Button>
+              </Stack>
+            </Stack>
           ) : (
-            <div className="space-y-2">
-              <input
+            <Stack spacing={1.5}>
+              <TextField
                 autoFocus
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                placeholder="Route name"
+                size="small"
+                label="Route name"
                 value={routeName}
                 onChange={e => setRouteName(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSaveRoute()}
+                fullWidth
               />
-              <input
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                placeholder="Description (optional)"
+              <TextField
+                size="small"
+                label="Description"
+                placeholder="Optional"
                 value={routeDesc}
                 onChange={e => setRouteDesc(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSaveRoute()}
+                fullWidth
               />
-              <div className="flex gap-2 justify-end">
-                <button className="text-sm text-gray-500 underline" onClick={() => setSavingRoute(false)}>Back</button>
-                <button
-                  className="bg-gray-900 text-white text-sm rounded-lg px-3 py-1.5 disabled:opacity-40"
-                  disabled={!routeName.trim()}
-                  onClick={handleSaveRoute}
-                >
+              <Stack direction="row" spacing={1} justifyContent="flex-end">
+                <Button variant="text" size="small" color="inherit" onClick={() => setSavingRoute(false)}>
+                  Back
+                </Button>
+                <Button variant="contained" size="small" disabled={!routeName.trim()} onClick={handleSaveRoute}>
                   Save
-                </button>
-              </div>
-            </div>
+                </Button>
+              </Stack>
+            </Stack>
           )}
-        </div>
+        </Paper>
       )}
     </div>
   );

@@ -1,7 +1,14 @@
 "use client";
+import { Stack, Typography, Button, Chip } from "@mui/material";
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
 import type { Route } from "@/lib/store";
 
-const MODE_LABELS: Record<string, string> = { foot: "🚶 Walking", bike: "🚴 Cycling" };
+const MODE_LABELS: Record<string, string> = { foot: "Walking", bike: "Cycling" };
+const MODE_ICONS: Record<string, React.ReactElement> = {
+  foot: <DirectionsWalkIcon sx={{ fontSize: "1rem !important" }} />,
+  bike: <DirectionsBikeIcon sx={{ fontSize: "1rem !important" }} />,
+};
 
 function fmtDist(km: number) {
   return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
@@ -11,65 +18,62 @@ function fmtTime(sec: number) {
   return m < 60 ? `~${m} min` : `~${Math.floor(m / 60)} h ${m % 60} min`;
 }
 
+const label = { textTransform: "uppercase", letterSpacing: 0.5, display: "block" } as const;
+
 type Props = { route: Route; isOwn: boolean; onEdit: () => void; onRemove: () => void };
 
 export function RoutePopup({ route, isOwn, onEdit, onRemove }: Props) {
   return (
-    <div className="w-52 p-3 space-y-2">
+    <Stack spacing={1.5} sx={{ width: 200, pt: 0.5 }}>
       <div>
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Name</p>
-        <p className="font-medium text-sm">{route.name}</p>
+        <Typography variant="caption" color="text.secondary" sx={label}>Name</Typography>
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>{route.name}</Typography>
       </div>
 
       {route.type && (
-        <div>
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Transport</p>
-          <p className="text-sm">{MODE_LABELS[route.type] ?? route.type}</p>
-        </div>
+        <Chip
+          size="small"
+          icon={MODE_ICONS[route.type]}
+          label={MODE_LABELS[route.type] ?? route.type}
+          variant="outlined"
+          sx={{ alignSelf: "flex-start" }}
+        />
       )}
 
       {(route.distance != null || route.duration != null) && (
-        <div className="flex gap-4">
+        <Stack direction="row" spacing={3}>
           {route.distance != null && (
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Distance</p>
-              <p className="text-sm font-medium">{fmtDist(route.distance)}</p>
+              <Typography variant="caption" color="text.secondary" sx={label}>Distance</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>{fmtDist(route.distance)}</Typography>
             </div>
           )}
           {route.duration != null && (
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Time</p>
-              <p className="text-sm font-medium">{fmtTime(route.duration)}</p>
+              <Typography variant="caption" color="text.secondary" sx={label}>Time</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>{fmtTime(route.duration)}</Typography>
             </div>
           )}
-        </div>
+        </Stack>
       )}
 
       {route.description && (
         <div>
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Description</p>
-          <p className="text-sm text-gray-600">{route.description}</p>
+          <Typography variant="caption" color="text.secondary" sx={label}>Description</Typography>
+          <Typography variant="body2" color="text.secondary">{route.description}</Typography>
         </div>
       )}
 
       {isOwn ? (
-        <div className="flex gap-2 pt-1">
-          <button
-            className="flex-1 border border-gray-200 rounded-lg px-2 py-1 text-sm hover:bg-gray-50"
-            onClick={onEdit}
-          >
-            Edit
-          </button>
-          <button
-            className="border border-red-200 text-red-500 rounded-lg px-2 py-1 text-sm hover:bg-red-50"
-            onClick={onRemove}
-          >
-            Delete
-          </button>
-        </div>
+        <Stack direction="row" spacing={1} pt={0.5}>
+          <Button variant="outlined" size="small" onClick={onEdit} sx={{ flex: 1 }}>Edit</Button>
+          <Button variant="outlined" size="small" color="error" onClick={onRemove}>Delete</Button>
+        </Stack>
       ) : (
-        <p className="text-xs text-gray-400 italic">Added by a colleague</p>
+        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+          Added by a colleague
+        </Typography>
       )}
-    </div>
+    </Stack>
   );
 }

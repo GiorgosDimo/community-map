@@ -1,4 +1,5 @@
 "use client";
+import { Dialog, DialogContent, DialogTitle, Grid, ButtonBase, Typography } from "@mui/material";
 
 const LOCATIONS = [
   { type: "Home", icon: "🏠" },
@@ -12,27 +13,38 @@ type Props = { onTypeSelected: (type: string) => void };
 
 export function StartingLocationModal({ onTypeSelected }: Props) {
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-[min(320px,calc(100vw-2rem))] space-y-6">
-        <div className="space-y-1 text-center">
-          <h2 className="text-xl font-semibold tracking-tight">Welcome!</h2>
-          <p className="text-sm text-gray-500">
-            Where are you joining from? Pick a type, then click on the map to pin your starting location.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
+    <Dialog open maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+      <DialogTitle sx={{ textAlign: "center", fontWeight: 700, pb: 1 }}>
+        Welcome!
+      </DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", mb: 2.5 }}>
+          Where are you joining from? Pick a type, then click on the map to pin your starting location.
+        </Typography>
+        <Grid container spacing={1.5}>
           {LOCATIONS.map(({ type, icon }) => (
-            <button
-              key={type}
-              onClick={() => onTypeSelected(type)}
-              className="flex flex-col items-center gap-2 border border-gray-200 rounded-xl p-4 hover:border-gray-900 hover:bg-gray-50 transition-colors text-sm font-medium"
-            >
-              <span className="text-2xl">{icon}</span>
-              {type}
-            </button>
+            <Grid item xs={6} key={type}>
+              <ButtonBase
+                onClick={() => onTypeSelected(type)}
+                sx={{
+                  width: "100%",
+                  borderRadius: 2,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  p: 2,
+                  flexDirection: "column",
+                  gap: 0.75,
+                  "&:hover": { bgcolor: "action.hover", borderColor: "text.primary" },
+                  transition: "border-color 0.15s, background-color 0.15s",
+                }}
+              >
+                <Typography variant="h5">{icon}</Typography>
+                <Typography variant="body2" fontWeight={500}>{type}</Typography>
+              </ButtonBase>
+            </Grid>
           ))}
-        </div>
-      </div>
-    </div>
+        </Grid>
+      </DialogContent>
+    </Dialog>
   );
 }

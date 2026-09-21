@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { Paper, Typography } from "@mui/material";
 import { Menu } from "@/components/Menu";
 import { StartingLocationModal } from "@/components/StartingLocationModal";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
@@ -49,6 +50,16 @@ export default function Home() {
     setShowWelcome(true);
   };
 
+  const hintText = pickingHomeType
+    ? `Click on the map to pin your ${pickingHomeType} location`
+    : mode === "addSpot"
+    ? "Click on the map to drop a spot"
+    : mode === "addRoute"
+    ? "Click the map or spot markers to add waypoints"
+    : mounted && homeLocation
+    ? `Click the menu icon to add a new spot or route close to your ${homeLocation.type}`
+    : "Click the menu icon to get started";
+
   return (
     <main className="relative h-screen w-full">
       {showWelcome && (
@@ -67,17 +78,26 @@ export default function Home() {
         hasLocation={hasLocation}
       />
 
-      <div className="absolute top-4 left-16 right-4 text-center sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto z-[1000] bg-white rounded-lg shadow-md px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm text-gray-600 border border-gray-100 pointer-events-none">
-        {pickingHomeType
-          ? `Click on the map to pin your ${pickingHomeType} location`
-          : mode === "addSpot"
-          ? "Click on the map to drop a spot"
-          : mode === "addRoute"
-          ? "Click the map or spot markers to add waypoints"
-          : mounted && homeLocation
-          ? `Click the menu icon to add a new spot or route close to your ${homeLocation.type}`
-          : "Click the menu icon to get started"}
-      </div>
+      <Paper
+        elevation={2}
+        sx={{
+          position: "absolute",
+          top: 16,
+          left: { xs: 64, sm: "50%" },
+          right: { xs: 16, sm: "auto" },
+          transform: { xs: "none", sm: "translateX(-50%)" },
+          zIndex: 1000,
+          px: { xs: 2, sm: 2.5 },
+          py: { xs: 1, sm: 1.25 },
+          pointerEvents: "none",
+          borderRadius: 2.5,
+          whiteSpace: { sm: "nowrap" },
+        }}
+      >
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
+          {hintText}
+        </Typography>
+      </Paper>
 
       <MapCanvas
         spotsVisible={spotsVisible}
