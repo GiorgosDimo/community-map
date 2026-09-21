@@ -1,6 +1,6 @@
 # Community Map
 
-**Live demo:** https://community-map-woad.vercel.app/
+**[Live Demo →](https://community-map-woad.vercel.app/)**
 
 A collaborative web app for pinning interesting spots and drawing routes near your workplace, home, school, or university — so colleagues and neighbours can discover and enjoy them together.
 
