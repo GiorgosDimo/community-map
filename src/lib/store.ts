@@ -22,10 +22,20 @@ export type Route = {
 const genId = () =>
   crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 
-// Utrecht bounding box (office area)
-const BBOX = { minLng: 5.05, maxLng: 5.20, minLat: 52.05, maxLat: 52.15 };
-
 export type HomeLocation = { type: string; coordinates: [number, number] };
+
+const HALF_LNG = 0.075; // ~5 km
+const HALF_LAT = 0.05;  // ~5.5 km
+
+export function homeBbox(home: HomeLocation) {
+  const [lng, lat] = home.coordinates;
+  return { minLng: lng - HALF_LNG, maxLng: lng + HALF_LNG, minLat: lat - HALF_LAT, maxLat: lat + HALF_LAT };
+}
+
+export function withinBbox(lng: number, lat: number, home: HomeLocation): boolean {
+  const b = homeBbox(home);
+  return lng >= b.minLng && lng <= b.maxLng && lat >= b.minLat && lat <= b.maxLat;
+}
 
 export function getStartingLocation(): HomeLocation | null {
   if (typeof localStorage === "undefined") return null;
@@ -41,9 +51,6 @@ export function deleteStartingLocation(): void {
   if (typeof localStorage !== "undefined") localStorage.removeItem("starting_location");
 }
 
-export function withinBbox(lng: number, lat: number): boolean {
-  return lng >= BBOX.minLng && lng <= BBOX.maxLng && lat >= BBOX.minLat && lat <= BBOX.maxLat;
-}
 
 function load<T>(key: string): T[] {
   if (typeof localStorage === "undefined") return [];
@@ -62,7 +69,8 @@ function save<T>(key: string, data: T[]): void {
 export const spotsStore = {
   getAll(): Spot[] { return load("spots"); },
   add(spot: Omit<Spot, "id">): Spot {
-    if (!withinBbox(spot.coordinates[0], spot.coordinates[1])) {
+    const home = getStartingLocation();
+    if (home && !withinBbox(spot.coordinates[0], spot.coordinates[1], home)) {
       throw new Error("Spot coordinates outside allowed area");
     }
     const entry: Spot = { ...spot, id: genId() };

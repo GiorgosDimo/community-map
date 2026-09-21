@@ -20,15 +20,16 @@ const OUTSIDE: [number, number] = [4.48, 51.92];
 beforeEach(() => localStorage.clear());
 
 describe("withinBbox", () => {
-  it("accepts coords inside Utrecht bbox", () => {
-    expect(withinBbox(5.12, 52.09)).toBe(true);
+  const home = { type: "Work", coordinates: [5.12, 52.09] as [number, number] };
+  it("accepts coords inside bbox", () => {
+    expect(withinBbox(5.12, 52.09, home)).toBe(true);
   });
   it("rejects coords outside bbox", () => {
-    expect(withinBbox(4.48, 51.92)).toBe(false);
+    expect(withinBbox(4.48, 51.92, home)).toBe(false);
   });
-  it("accepts coords on the inclusive min edge", () => {
-    expect(withinBbox(5.05, 52.05)).toBe(true);
-    expect(withinBbox(5.12, 52.09)).toBe(true);
+  it("accepts coords near the edge", () => {
+    expect(withinBbox(5.12 + 0.07, 52.09, home)).toBe(true);
+    expect(withinBbox(5.12 + 0.08, 52.09, home)).toBe(false);
   });
 });
 

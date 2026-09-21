@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, LayerGroup, useMapEvents, useMap, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, LayerGroup, Rectangle, useMapEvents, useMap, ZoomControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useSpots } from "@/hooks/useSpots";
 import { useRoutes } from "@/hooks/useRoutes";
-import { withinBbox, type HomeLocation, type Spot, type Route } from "@/lib/store";
+import { withinBbox, homeBbox, type HomeLocation, type Spot, type Route } from "@/lib/store";
 import { getSessionToken } from "@/lib/session";
 import { SpotPopup } from "./SpotPopup";
 import { RoutePopup } from "./RoutePopup";
@@ -81,6 +81,23 @@ function PopupTracker({ onOpen }: { onOpen?: (open: boolean) => void }) {
     popupopen: () => onOpen?.(true),
     popupclose: () => onOpen?.(false),
   });
+  return null;
+}
+
+function BoundsController({ home, pickingHome }: { home: HomeLocation | null | undefined; pickingHome: boolean }) {
+  const map = useMap();
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!home || pickingHome) {
+      map.setMaxBounds(null as unknown as L.LatLngBoundsExpression);
+      return;
+    }
+    const b = homeBbox(home);
+    const bounds = L.latLngBounds([b.minLat, b.minLng], [b.maxLat, b.maxLng]);
+    map.setMaxBounds(bounds.pad(0.15));
+    if (mounted.current) map.fitBounds(bounds, { animate: true });
+    mounted.current = true;
+  }, [home, pickingHome, map]);
   return null;
 }
 
@@ -240,8 +257,8 @@ export function MapCanvas({
     if (pickingHome) { setPendingHomeLatLng(latlng); return; }
     if (mode === "addRoute") { addWaypoint([latlng.lng, latlng.lat]); return; }
     if (mode === "addSpot") {
-      if (!withinBbox(latlng.lng, latlng.lat)) {
-        alert("That location is outside the allowed area. Please drop pins near the office.");
+      if (homeLocation && !withinBbox(latlng.lng, latlng.lat, homeLocation)) {
+        alert("That location is outside the allowed area. Please drop pins near your chosen location.");
         return;
       }
       setPendingLatLng(latlng);
@@ -275,6 +292,16 @@ export function MapCanvas({
         />
         <ZoomControl position="topright" />
         <PopupTracker onOpen={onPopupOpen} />
+        <BoundsController home={homeLocation} pickingHome={pickingHome} />
+        {homeLocation && (() => {
+          const b = homeBbox(homeLocation);
+          return (
+            <Rectangle
+              bounds={[[b.minLat, b.minLng], [b.maxLat, b.maxLng]]}
+              pathOptions={{ color: "#2563eb", weight: 2, fillOpacity: 0.04, dashArray: "8 6" }}
+            />
+          );
+        })()}
         <ClickHandler
           onMapClick={handleMapClick}
           onClearEdit={() => { setEditingSpot(null); setEditingRoute(null); }}
