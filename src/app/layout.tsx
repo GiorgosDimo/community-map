@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   description: "Drop pins for small good things around the workplace",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

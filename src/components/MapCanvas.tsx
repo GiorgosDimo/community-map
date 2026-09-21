@@ -447,15 +447,16 @@ export function MapCanvas({
           elevation={4}
           sx={{
             position: "absolute",
-            bottom: 32,
-            left: { xs: 16, sm: "50%" },
-            right: { xs: 16, sm: "auto" },
+            bottom: 0,
+            left: { xs: 0, sm: "50%" },
+            right: { xs: 0, sm: "auto" },
             transform: { xs: "none", sm: "translateX(-50%)" },
             minWidth: { sm: 320 },
             zIndex: 1000,
-            borderRadius: 3,
+            borderRadius: { xs: "12px 12px 0 0", sm: 3 },
             px: 3,
-            py: 2.5,
+            pt: 2.5,
+            pb: "calc(20px + env(safe-area-inset-bottom, 0px))",
           }}
         >
           <ToggleButtonGroup

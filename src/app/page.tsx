@@ -83,8 +83,8 @@ export default function Home() {
         elevation={2}
         sx={{
           position: "absolute",
-          top: 16,
-          left: { xs: 64, sm: "50%" },
+          top: { xs: 72, sm: 16 },
+          left: { xs: 16, sm: "50%" },
           right: { xs: 16, sm: "auto" },
           transform: { xs: "none", sm: "translateX(-50%)" },
           zIndex: 1000,

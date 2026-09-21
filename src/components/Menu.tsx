@@ -77,7 +77,7 @@ export function Menu({
                   variant={mode === "addSpot" ? "contained" : "outlined"}
                   size="small"
                   disabled={addSpotDisabled}
-                  onClick={onAddSpot}
+                  onClick={() => { onAddSpot(); setOpen(false); }}
                   title={addSpotDisabled ? "Choose your starting location first" : undefined}
                   fullWidth
                 >
@@ -87,7 +87,7 @@ export function Menu({
                   variant={mode === "addRoute" ? "contained" : "outlined"}
                   size="small"
                   disabled={addRouteDisabled}
-                  onClick={onAddRoute}
+                  onClick={() => { onAddRoute(); setOpen(false); }}
                   title={
                     !hasLocation
                       ? "Choose your starting location first"
