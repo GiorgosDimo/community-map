@@ -1,5 +1,7 @@
 # Community Map
 
+**Live demo:** https://community-rg2t90bi6-georgosdimopoulos-2195.vercel.app/
+
 A collaborative web app for pinning interesting spots and drawing routes near your workplace, home, school, or university — so colleagues and neighbours can discover and enjoy them together.
 
 ## Features
