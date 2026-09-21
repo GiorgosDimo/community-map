@@ -23,3 +23,13 @@
   font-size: 1rem;
   line-height: inherit;
 }
+
+/* Larger close button for touch screens */
+.leaflet-popup-close-button {
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 20px !important;
+  line-height: 32px !important;
+  top: 4px !important;
+  right: 4px !important;
+}

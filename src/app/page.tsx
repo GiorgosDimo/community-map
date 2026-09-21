@@ -87,7 +87,7 @@ export default function Home() {
           position: "absolute",
           top: 16,
           left: 61,
-          right: 44,
+          right: 45,
           zIndex: 1000,
           p: "5px",
           pointerEvents: "none",

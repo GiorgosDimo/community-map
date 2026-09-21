@@ -446,7 +446,7 @@ export function MapCanvas({
         <Paper
           elevation={4}
           sx={{
-            position: "absolute",
+            position: "fixed",
             bottom: 0,
             left: { xs: 0, sm: "50%" },
             right: { xs: 0, sm: "auto" },
