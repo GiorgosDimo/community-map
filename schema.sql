@@ -3,6 +3,9 @@
 CREATE TABLE users (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username    TEXT UNIQUE NOT NULL,
+  home_type   TEXT,
+  home_lng    DOUBLE PRECISION,
+  home_lat    DOUBLE PRECISION,
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -22,6 +25,11 @@ CREATE TABLE spots (
   lat         DOUBLE PRECISION NOT NULL,
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Run this if you already created the table without home columns:
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS home_type TEXT;
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS home_lng DOUBLE PRECISION;
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS home_lat DOUBLE PRECISION;
 
 CREATE TABLE routes (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),

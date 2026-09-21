@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { userFromToken, requireToken } from "@/lib/db";
+import { userFromToken, requireToken, sanitize } from "@/lib/db";
 
 function toRoute(row: Record<string, unknown>) {
   return {
@@ -30,14 +30,17 @@ export async function POST(req: Request) {
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
+  const name = sanitize(body.name, 200);
+  const description = sanitize(body.description, 1000);
+  if (!name) return Response.json({ error: "Name is required" }, { status: 400 });
   const { data, error } = await supabase
     .from("routes")
     .insert({
       user_id: user.id,
-      name: body.name,
-      type: body.type ?? "",
-      colour: body.colour ?? "#3b82f6",
-      description: body.description ?? "",
+      name,
+      type: sanitize(body.type, 50),
+      colour: sanitize(body.colour, 20) || "#3b82f6",
+      description,
       waypoints: body.waypoints ?? [],
       geometry: body.geometry ?? [],
       distance: body.distance ?? null,

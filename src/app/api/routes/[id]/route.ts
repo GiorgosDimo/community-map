@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { userFromToken, requireToken } from "@/lib/db";
+import { userFromToken, requireToken, sanitize } from "@/lib/db";
 
 async function getOwner(id: string) {
   const { data } = await supabase.from("routes").select("user_id").eq("id", id).single();
@@ -12,10 +12,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
   if ((await getOwner(id)) !== user.id) return Response.json({ error: "Forbidden" }, { status: 403 });
 
-  const patch = await req.json();
+  const raw = await req.json();
+  const patch = { name: sanitize(raw.name, 200), description: sanitize(raw.description, 1000) };
+  if (!patch.name) return Response.json({ error: "Name is required" }, { status: 400 });
   const { data, error } = await supabase
     .from("routes")
-    .update({ name: patch.name, description: patch.description })
+    .update(patch)
     .eq("id", id)
     .select("*")
     .single();

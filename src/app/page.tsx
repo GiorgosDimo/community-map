@@ -14,7 +14,7 @@ import type L from "leaflet";
 const MapCanvas = dynamic(() => import("@/components/MapCanvas").then((m) => m.MapCanvas), { ssr: false });
 
 type Mode = "idle" | "addSpot" | "addRoute";
-type User = { id: string; username: string };
+type User = { id: string; username: string; home?: HomeLocation | null };
 
 export default function Home() {
   const [spotsVisible, setSpotsVisible] = useState(true);
@@ -46,7 +46,13 @@ export default function Home() {
       .then(data => {
         if (data?.user) {
           setCurrentUser(data.user);
-          if (!hasLocation) setShowWelcome(true);
+          const dbHome: HomeLocation | null = data.user.home ?? null;
+          if (dbHome) {
+            saveHome(dbHome);
+          } else if (homeLocation) {
+            saveHome(homeLocation); // local home exists but not in DB — sync it up
+          }
+          if (!dbHome && !homeLocation) setShowWelcome(true);
         } else {
           setNeedUsername(true);
         }
@@ -61,7 +67,9 @@ export default function Home() {
   const handleAuthSuccess = (user: User) => {
     setCurrentUser(user);
     setNeedUsername(false);
-    if (!hasLocation) setShowWelcome(true);
+    const dbHome = user.home ?? null;
+    if (dbHome) saveHome(dbHome);
+    if (!dbHome && !hasLocation) setShowWelcome(true);
   };
 
   const toggleMode = (next: "addSpot" | "addRoute") =>

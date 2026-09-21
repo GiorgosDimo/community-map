@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { userFromToken, requireToken } from "@/lib/db";
+import { userFromToken, requireToken, sanitize } from "@/lib/db";
 
 function toSpot(row: Record<string, unknown>) {
   return {
@@ -24,10 +24,14 @@ export async function POST(req: Request) {
   const user = await userFromToken(requireToken(req));
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, description, coordinates } = await req.json();
+  const body = await req.json();
+  const name = sanitize(body.name, 200);
+  const description = sanitize(body.description, 1000);
+  const coordinates: [number, number] = body.coordinates;
+  if (!name) return Response.json({ error: "Name is required" }, { status: 400 });
   const { data, error } = await supabase
     .from("spots")
-    .insert({ user_id: user.id, name, description: description ?? "", lng: coordinates[0], lat: coordinates[1] })
+    .insert({ user_id: user.id, name, description, lng: coordinates[0], lat: coordinates[1] })
     .select("*")
     .single();
 
