@@ -447,7 +447,7 @@ export function MapCanvas({
           elevation={4}
           sx={{
             position: "fixed",
-            bottom: 0,
+            bottom: 20,
             left: { xs: 0, sm: "50%" },
             right: { xs: 0, sm: "auto" },
             transform: { xs: "none", sm: "translateX(-50%)" },

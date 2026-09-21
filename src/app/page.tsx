@@ -86,13 +86,15 @@ export default function Home() {
         sx={{
           position: "absolute",
           top: 16,
-          left: 61,
-          right: 45,
+          left: { xs: 61, sm: "50%" },
+          right: { xs: 48, sm: "auto" },
+          transform: { xs: "none", sm: "translateX(-50%)" },
           zIndex: 1000,
           p: "5px",
           pointerEvents: "none",
           borderRadius: 1,
           textAlign: "center",
+          whiteSpace: { sm: "nowrap" },
         }}
       >
         <Typography variant="body2" color="text.secondary">
