@@ -23,6 +23,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     setMounted(true);
     if (!hasLocation) setShowWelcome(true);
@@ -77,25 +78,24 @@ export default function Home() {
         onAddSpot={() => toggleMode("addSpot")}
         onAddRoute={() => toggleMode("addRoute")}
         hasLocation={hasLocation}
+        onOpenChange={setMenuOpen}
       />
 
-      {!popupOpen && <Paper
+      {!popupOpen && !menuOpen && <Paper
         elevation={2}
         sx={{
           position: "absolute",
-          top: { xs: 72, sm: 16 },
-          left: { xs: 16, sm: "50%" },
-          right: { xs: 16, sm: "auto" },
-          transform: { xs: "none", sm: "translateX(-50%)" },
+          top: 16,
+          left: 61,
+          right: 44,
           zIndex: 1000,
-          px: { xs: 2, sm: 2.5 },
-          py: { xs: 1, sm: 1.25 },
+          p: "5px",
           pointerEvents: "none",
-          borderRadius: 2.5,
-          whiteSpace: { sm: "nowrap" },
+          borderRadius: 1,
+          textAlign: "center",
         }}
       >
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
+        <Typography variant="body2" color="text.secondary">
           {hintText}
         </Typography>
       </Paper>}

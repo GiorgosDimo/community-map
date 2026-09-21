@@ -15,13 +15,15 @@ type Props = {
   onAddSpot: () => void;
   onAddRoute: () => void;
   hasLocation: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function Menu({
   spotsVisible, routesVisible, onToggleSpots, onToggleRoutes,
-  mode, onAddSpot, onAddRoute, hasLocation,
+  mode, onAddSpot, onAddRoute, hasLocation, onOpenChange,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const toggle = (v: boolean) => { setOpen(v); onOpenChange?.(v); };
   const addSpotDisabled = !hasLocation;
   const addRouteDisabled = !hasLocation || !routesVisible;
 
@@ -30,7 +32,7 @@ export function Menu({
       {open && (
         <Box
           sx={{ position: "fixed", inset: 0, zIndex: 999 }}
-          onClick={() => setOpen(false)}
+          onClick={() => toggle(false)}
           aria-hidden
         />
       )}
@@ -38,7 +40,7 @@ export function Menu({
         {!open ? (
           <Paper elevation={3} sx={{ borderRadius: 2, display: "inline-flex" }}>
             <IconButton
-              onClick={() => setOpen(true)}
+              onClick={() => toggle(true)}
               aria-label="Open menu"
               size="small"
               sx={{ p: 1.25 }}
@@ -49,7 +51,7 @@ export function Menu({
         ) : (
           <Paper elevation={6} sx={{ borderRadius: 2.5, width: 224, overflow: "hidden" }}>
             <Box sx={{ px: 1.5, py: 1, borderBottom: 1, borderColor: "divider" }}>
-              <IconButton onClick={() => setOpen(false)} aria-label="Close menu" size="small">
+              <IconButton onClick={() => toggle(false)} aria-label="Close menu" size="small">
                 <CloseIcon fontSize="small" />
               </IconButton>
             </Box>
@@ -77,7 +79,7 @@ export function Menu({
                   variant={mode === "addSpot" ? "contained" : "outlined"}
                   size="small"
                   disabled={addSpotDisabled}
-                  onClick={() => { onAddSpot(); setOpen(false); }}
+                  onClick={() => { onAddSpot(); toggle(false); }}
                   title={addSpotDisabled ? "Choose your starting location first" : undefined}
                   fullWidth
                 >
@@ -87,7 +89,7 @@ export function Menu({
                   variant={mode === "addRoute" ? "contained" : "outlined"}
                   size="small"
                   disabled={addRouteDisabled}
-                  onClick={() => { onAddRoute(); setOpen(false); }}
+                  onClick={() => { onAddRoute(); toggle(false); }}
                   title={
                     !hasLocation
                       ? "Choose your starting location first"
