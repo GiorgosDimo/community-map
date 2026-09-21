@@ -9,7 +9,7 @@
 
 /* Raise popup pane above the menu and hint banner (both z-index 1000) */
 .leaflet-popup-pane {
-  z-index: 1100 !important;
+  z-index: 9999 !important;
 }
 
 /* Reset Leaflet popup chrome so MUI components render correctly inside popups */

@@ -22,6 +22,7 @@ export default function Home() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
   useEffect(() => {
     setMounted(true);
     if (!hasLocation) setShowWelcome(true);
@@ -78,7 +79,7 @@ export default function Home() {
         hasLocation={hasLocation}
       />
 
-      <Paper
+      {!popupOpen && <Paper
         elevation={2}
         sx={{
           position: "absolute",
@@ -97,7 +98,7 @@ export default function Home() {
         <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
           {hintText}
         </Typography>
-      </Paper>
+      </Paper>}
 
       <MapCanvas
         spotsVisible={spotsVisible}
@@ -109,6 +110,7 @@ export default function Home() {
         homeLocation={homeLocation}
         onHomeEdit={handleHomeEdit}
         onHomeDelete={handleHomeDelete}
+        onPopupOpen={setPopupOpen}
       />
     </main>
   );
