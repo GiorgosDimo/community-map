@@ -14,20 +14,20 @@ type Props = { onGetStarted: () => void };
 
 export function WelcomeScreen({ onGetStarted }: Props) {
   return (
-    <Dialog open maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
+    <Dialog open maxWidth="xs" fullWidth sx={{ "& .MuiDialog-paper": { borderRadius: 3, p: 1 } }}>
       <DialogContent>
-        <Stack spacing={3} alignItems="center">
+        <Stack spacing={3} sx={{ alignItems: "center" }}>
           <Box sx={{ textAlign: "center" }}>
-            <Typography variant="h3" mb={0.5}>🗺️</Typography>
+            <Typography variant="h3" sx={{ mb: 0.5 }}>🗺️</Typography>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>Community Map</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               Discover and share interesting spots and routes around where you live, work, or study.
             </Typography>
           </Box>
 
-          <Stack spacing={1.5} width="100%">
+          <Stack spacing={1.5} sx={{ width: "100%" }}>
             {FEATURES.map(({ Icon, text }, i) => (
-              <Stack key={i} direction="row" spacing={1.5} alignItems="flex-start">
+              <Stack key={i} direction="row" spacing={1.5} sx={{ alignItems: "flex-start" }}>
                 <Icon color="primary" sx={{ mt: 0.25, flexShrink: 0 }} />
                 <Typography variant="body2" color="text.secondary">{text}</Typography>
               </Stack>

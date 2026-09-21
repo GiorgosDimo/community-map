@@ -474,7 +474,7 @@ export function MapCanvas({
           </ToggleButtonGroup>
 
           {!savingRoute ? (
-            <Stack direction="row" alignItems="center" spacing={2}>
+            <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
               <Typography variant="body2" color="text.secondary">
                 {routeLoading ? "Routing…" : `${routeWaypoints.length} point${routeWaypoints.length !== 1 ? "s" : ""}`}
               </Typography>
@@ -514,7 +514,7 @@ export function MapCanvas({
                 onKeyDown={e => e.key === "Enter" && handleSaveRoute()}
                 fullWidth
               />
-              <Stack direction="row" spacing={1} justifyContent="flex-end">
+              <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
                 <Button variant="text" size="small" color="inherit" onClick={() => setSavingRoute(false)}>
                   Back
                 </Button>

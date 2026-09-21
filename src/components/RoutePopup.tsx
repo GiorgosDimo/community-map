@@ -65,7 +65,7 @@ export function RoutePopup({ route, isOwn, onEdit, onRemove }: Props) {
       )}
 
       {isOwn ? (
-        <Stack direction="row" spacing={1} pt={0.5}>
+        <Stack direction="row" spacing={1} sx={{ pt: 0.5 }}>
           <Button variant="outlined" size="small" onClick={onEdit} sx={{ flex: 1 }}>Edit</Button>
           <Button variant="outlined" size="small" color="error" onClick={onRemove}>Delete</Button>
         </Stack>

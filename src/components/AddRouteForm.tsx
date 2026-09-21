@@ -53,7 +53,7 @@ export function AddRouteForm({ spots, onSave, onCancel }: Props) {
           ))}
         </Stack>
       )}
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
         <Button
           variant="contained"
           size="small"
