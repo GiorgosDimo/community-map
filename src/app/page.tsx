@@ -17,6 +17,11 @@ type Mode = "idle" | "addSpot" | "addRoute";
 type User = { id: string; username: string; home?: HomeLocation | null };
 
 export default function Home() {
+  const [sharedUser] = useState<string | null>(() =>
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("u") : null
+  );
+  const [sharedCenter, setSharedCenter] = useState<[number, number] | null>(null);
+
   const [spotsVisible, setSpotsVisible] = useState(true);
   const [routesVisible, setRoutesVisible] = useState(false);
   const [mode, setMode] = useState<Mode>("idle");
@@ -53,7 +58,7 @@ export default function Home() {
             saveHome(homeLocation); // local home exists but not in DB — sync it up
           }
           if (!dbHome && !homeLocation) setShowWelcome(true);
-        } else {
+        } else if (!sharedUser) {
           setNeedUsername(true);
         }
         setAuthReady(true);
@@ -63,6 +68,19 @@ export default function Home() {
         setAuthReady(true);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!sharedUser) return;
+    fetch(`/api/users?u=${encodeURIComponent(sharedUser)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.home) {
+          const [lng, lat] = data.home.coordinates;
+          setSharedCenter([lat, lng]);
+        }
+      })
+      .catch(() => {});
+  }, [sharedUser]);
 
   const handleAuthSuccess = (user: User) => {
     setCurrentUser(user);
@@ -131,6 +149,7 @@ export default function Home() {
         onAddRoute={() => toggleMode("addRoute")}
         hasLocation={hasLocation}
         onOpenChange={setMenuOpen}
+        username={currentUser?.username}
       />
 
       {!popupOpen && !menuOpen && <Paper
@@ -166,6 +185,7 @@ export default function Home() {
         onHomeDelete={handleHomeDelete}
         onPopupOpen={setPopupOpen}
         currentUserId={currentUser?.id ?? ""}
+        sharedCenter={sharedCenter}
       />
     </main>
   );

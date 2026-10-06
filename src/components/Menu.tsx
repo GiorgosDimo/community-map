@@ -16,11 +16,12 @@ type Props = {
   onAddRoute: () => void;
   hasLocation: boolean;
   onOpenChange?: (open: boolean) => void;
+  username?: string;
 };
 
 export function Menu({
   spotsVisible, routesVisible, onToggleSpots, onToggleRoutes,
-  mode, onAddSpot, onAddRoute, hasLocation, onOpenChange,
+  mode, onAddSpot, onAddRoute, hasLocation, onOpenChange, username,
 }: Props) {
   const [open, setOpen] = useState(false);
   const toggle = (v: boolean) => { setOpen(v); onOpenChange?.(v); };
@@ -100,6 +101,35 @@ export function Menu({
                   fullWidth
                 >
                   ∼ Add route
+                </Button>
+              </Stack>
+
+              <Divider />
+
+              <Stack spacing={1}>
+                {username && (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/?u=${encodeURIComponent(username)}`);
+                      toggle(false);
+                    }}
+                  >
+                    Share my map
+                  </Button>
+                )}
+                <Button
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.origin);
+                    toggle(false);
+                  }}
+                >
+                  Share app
                 </Button>
               </Stack>
             </Stack>

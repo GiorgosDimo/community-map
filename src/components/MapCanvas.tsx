@@ -72,6 +72,7 @@ type Props = {
   onHomeDelete: () => void;
   onPopupOpen?: (open: boolean) => void;
   currentUserId: string;
+  sharedCenter?: [number, number] | null;
 };
 
 const CENTER: [number, number] = [52.0907, 5.1214];
@@ -81,6 +82,17 @@ function PopupTracker({ onOpen }: { onOpen?: (open: boolean) => void }) {
     popupopen: () => onOpen?.(true),
     popupclose: () => onOpen?.(false),
   });
+  return null;
+}
+
+function CenterController({ target }: { target: [number, number] | null | undefined }) {
+  const map = useMap();
+  const done = useRef(false);
+  useEffect(() => {
+    if (!target || done.current) return;
+    done.current = true;
+    map.flyTo(target, 14);
+  }, [target, map]);
   return null;
 }
 
@@ -182,7 +194,7 @@ function InlineEditForm({
 export function MapCanvas({
   spotsVisible, routesVisible, mode, onModeChange,
   pickingHome, onHomePicked, homeLocation, onHomeEdit, onHomeDelete,
-  onPopupOpen, currentUserId,
+  onPopupOpen, currentUserId, sharedCenter,
 }: Props) {
   const { spots, add: addSpot, update: updateSpot, remove: removeSpot } = useSpots();
   const { routes, add: addRoute, update: updateRoute, remove: removeRoute } = useRoutes();
@@ -292,6 +304,7 @@ export function MapCanvas({
         <ZoomControl position="topright" />
         <PopupTracker onOpen={onPopupOpen} />
         <BoundsController home={homeLocation} pickingHome={pickingHome} />
+        <CenterController target={sharedCenter} />
         {homeLocation && (() => {
           const b = homeBbox(homeLocation);
           return (
