@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     .select("id, username")
     .single();
 
-  if (error || !user) return Response.json({ error: "Failed to create user" }, { status: 500 });
+  if (error || !user) return Response.json({ error: error?.message ?? "Failed to create user" }, { status: 500 });
 
   await supabase.from("sessions").insert({ token, user_id: user.id });
   return Response.json({ user: { ...user, home: null } }, { status: 201 });
