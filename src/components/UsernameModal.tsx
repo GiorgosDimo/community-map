@@ -29,7 +29,8 @@ export function UsernameModal({ onSuccess }: { onSuccess: (user: User) => void }
     if (res.status === 201) { onSuccess((await res.json()).user); return; }
     if (res.status === 409) { setStep("conflict"); return; }
 
-    setError("Something went wrong. Please try again.");
+    const body = await res.json().catch(() => ({}));
+    setError(body?.error ?? `Error ${res.status}. Please try again.`);
     setStep("input");
   }
 
